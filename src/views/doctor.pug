@@ -1,0 +1,131 @@
+extends layouts/main
+
+block content
+  div(class="flex flex-col md:flex-row min-h-screen bg-slate-50 font-sans")
+    
+    //- Mobile Header
+    div(class="md:hidden bg-green-800 text-white p-4 flex justify-between items-center shadow-md z-20 relative")
+      div(class="flex items-center gap-2")
+        span(class="text-2xl") 
+        h2(class="text-lg font-bold tracking-wide") HMS-Care
+      button#mobileMenuBtn(class="text-white focus:outline-none p-2 rounded-lg hover:bg-green-700 transition-colors")
+        svg(class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24")
+          path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16")
+
+    //- Responsive Sidebar
+    aside#sidebar(class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-50 w-64 bg-green-900 text-white flex flex-col justify-between shadow-2xl md:shadow-lg")
+      div(class="p-6")
+        div(class="hidden md:flex items-center gap-3 mb-10 border-b border-green-800 pb-6")
+          span(class="text-3xl") 
+          h2(class="text-xl font-extrabold tracking-wider text-green-50") Care
+        
+        nav(class="space-y-2 mt-8 md:mt-0")
+          p(class="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-4 px-3") Clinical Menu
+          
+          //- ACTIVE PAGE: Dashboard Overview
+          a(href="/dashboard/doctor" class="flex items-center gap-3 bg-green-800 border-l-4 border-green-400 text-white p-3 rounded-r-lg shadow-inner font-bold transition-all")
+            span(class="text-lg") 
+            span Overview
+            
+          //- UPDATED LINK: My Schedule
+          a(href="/dashboard/doctor/schedule" class="flex items-center gap-3 text-green-200 hover:bg-green-800 hover:text-white p-3 rounded-lg font-medium transition-all group")
+            span(class="text-lg group-hover:scale-110 transition-transform") 
+            span My Schedule
+            
+          //- UPDATED LINK: Patient Directory
+          a(href="/dashboard/doctor/directory" class="flex items-center gap-3 text-green-200 hover:bg-green-800 hover:text-white p-3 rounded-lg font-medium transition-all group")
+            span(class="text-lg group-hover:scale-110 transition-transform") 
+            span Patient Directory
+      
+      div(class="p-6 border-t border-green-800")
+        a(href="/auth/logout" class="flex items-center justify-center gap-2 w-full bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5")
+          span 
+          span Secure Logout
+
+    //- Overlay for mobile
+    div#sidebarOverlay(class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity")
+
+    //- Main Content Area
+    main(class="flex-1 p-4 md:p-8 w-full max-w-7xl mx-auto overflow-y-auto")
+      
+      //- Doctor Header
+      header(class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100")
+        div(class="flex items-center gap-4")
+          div(class="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-2xl font-bold border-2 border-white shadow-sm") #{user.name.charAt(4)}
+          div
+            h2(class="text-2xl font-extrabold text-slate-800") Welcome, #{user.name}
+            p(class="text-sm text-slate-500 font-medium mt-1") You have <span class="text-green-600 font-bold">#{user.patientsRemaining} patients</span> remaining today.
+        
+        button(class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2") 
+          span 📝
+          span Quick Notes
+
+      //- Urgent Alert Banner
+      if user.urgent
+        div(class="bg-red-50 border border-red-200 p-4 rounded-2xl flex items-center justify-between mb-8 shadow-sm relative overflow-hidden")
+          div(class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500")
+          div(class="flex items-center gap-4 pl-2")
+            div(class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600 text-xl animate-pulse") ⚠️
+            div
+              h4(class="text-sm font-extrabold text-red-800 tracking-wide uppercase") Urgent Lab Result
+              p(class="text-sm text-red-700 font-medium mt-0.5") <span class="font-bold">#{user.urgent.patient}</span>: #{user.urgent.msg}
+          button(class="bg-red-600 text-white px-5 py-2 text-sm rounded-lg hover:bg-red-700 transition-colors font-bold shadow-sm") Review Now
+
+      div(class="grid grid-cols-1 lg:grid-cols-3 gap-8")
+        
+        //- Left Column: Today's Schedule
+        div(class="lg:col-span-2 space-y-8")
+          section(class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden")
+            div(class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50")
+              h3(class="text-sm font-extrabold text-slate-700 uppercase tracking-widest flex items-center gap-2") 
+                span(class="w-2 h-2 rounded-full bg-green-500")
+                | Today's Schedule
+              span(class="text-[10px] font-bold px-3 py-1 bg-green-100 text-green-700 rounded-full uppercase") #{user.schedule.length} Appointments
+            
+            div(class="divide-y divide-slate-100")
+              each slot in user.schedule
+                div(class="p-6 flex flex-col sm:flex-row sm:items-center gap-4 hover:bg-slate-50 transition-colors group")
+                  div(class="w-24 shrink-0")
+                    p(class="text-sm font-extrabold text-slate-800") #{slot.time}
+                    span(class="text-[10px] font-bold px-2 py-0.5 rounded-md mt-1 inline-block " + (slot.status === 'Completed' ? 'bg-green-100 text-green-700' : slot.status === 'In Progress' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700')) #{slot.status}
+                  
+                  div(class="flex-1")
+                    p(class="text-base font-bold text-slate-800") #{slot.name}
+                    p(class="text-sm text-slate-500 font-medium") #{slot.type}
+                  
+                  //- Action Buttons for the Doctor
+                  div(class="flex items-center gap-2 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity")
+                    a(href=`/dashboard/doctor/patient-view` class="px-4 py-2 bg-white border border-slate-200 hover:border-blue-300 hover:bg-blue-50 text-blue-600 text-xs font-bold rounded-lg transition-all shadow-sm") View EHR
+                    a(href=`/dashboard/doctor/prescribe` class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm") Prescribe
+
+        //- Right Column: Daily Stats
+        div(class="space-y-6")
+          section(class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100")
+            h3(class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-6") Shift Statistics
+            
+            div(class="space-y-4")
+              div(class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100")
+                div(class="flex items-center gap-3")
+                  div(class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-lg") 
+                  span(class="font-bold text-slate-700") Total Visits
+                span(class="text-xl font-black text-slate-800") #{user.stats.visits}
+              
+              div(class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100")
+                div(class="flex items-center gap-3")
+                  div(class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-lg") 🔬
+                  span(class="font-bold text-slate-700") Pending Labs
+                span(class="text-xl font-black text-slate-800") #{user.stats.labs}
+              
+              div(class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100")
+                div(class="flex items-center gap-3")
+                  div(class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-lg") 
+                  span(class="font-bold text-slate-700") Files to Review
+                span(class="text-xl font-black text-slate-800") #{user.stats.files}
+
+  script.
+    const btn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    function toggleMenu() { sidebar.classList.toggle('-translate-x-full'); overlay.classList.toggle('hidden'); }
+    btn.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);

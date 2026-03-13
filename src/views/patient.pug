@@ -1,0 +1,126 @@
+extends layouts/main
+
+block content
+  //- Main Layout Wrapper
+  div(class="flex flex-col md:flex-row min-h-screen bg-slate-50 font-sans")
+    
+    //- Mobile Header (Visible only on small screens)
+    div(class="md:hidden bg-green-800 text-white p-4 flex justify-between items-center shadow-md z-20 relative")
+      div(class="flex items-center gap-2")
+        span(class="text-2xl")
+        h2(class="text-lg font-bold tracking-wide") HMS-Care
+      button#mobileMenuBtn(class="text-white focus:outline-none p-2 rounded-lg hover:bg-green-700 transition-colors")
+        svg(class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24")
+          path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16")
+
+    //- Responsive Sidebar
+    aside#sidebar(class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-50 w-64 bg-green-900 text-white flex flex-col justify-between shadow-2xl md:shadow-lg")
+      div(class="p-6")
+        //- Desktop Logo
+        div(class="hidden md:flex items-center gap-3 mb-10 border-b border-green-800 pb-6")
+          span(class="text-3xl")
+          h2(class="text-xl font-extrabold tracking-wider text-green-50") Care
+        
+        //- Navigation Menu
+        nav(class="space-y-2 mt-8 md:mt-0")
+          p(class="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-4 px-3") Main Menu
+          
+          //- ACTIVE PAGE: Dashboard (Notice the border-l-4, bg-green-800, and text-white)
+          a(href="/dashboard/patient" class="flex items-center gap-3 bg-green-800 border-l-4 border-green-400 text-white p-3 rounded-r-lg shadow-inner font-bold transition-all")
+            span(class="text-lg") 
+            span Dashboard
+            
+          //- INACTIVE PAGE: Records (Notice the text-green-200 and hover states)
+          a(href="/dashboard/patient/records" class="flex items-center gap-3 text-green-200 hover:bg-green-800 hover:text-white p-3 rounded-lg font-medium transition-all group")
+            span(class="text-lg group-hover:scale-110 transition-transform") 
+            span Patient Records 
+            
+          //- INACTIVE PAGE: Appointments
+          a(href="/booking/new" class="flex items-center gap-3 text-green-200 hover:bg-green-800 hover:text-white p-3 rounded-lg font-medium transition-all group")
+            span(class="text-lg group-hover:scale-110 transition-transform") 
+            span Appointments 
+      
+      //- Bottom Action (Logout)
+      div(class="p-6 border-t border-green-800")
+        a(href="/auth/logout" class="flex items-center justify-center gap-2 w-full bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5")
+          span           Secure Logout
+
+    //- Overlay for mobile when sidebar is open
+    div#sidebarOverlay(class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity")
+
+    //- Main Content Area
+    main(class="flex-1 p-4 md:p-8 w-full max-w-7xl mx-auto overflow-y-auto")
+      
+      //- Page Header
+      header(class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-100")
+        div(class="flex items-center gap-4")
+          div(class="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-2xl font-bold border-2 border-white shadow-sm") #{user.name.charAt(0)}
+          div
+            h2(class="text-2xl font-extrabold text-slate-800") Welcome back, #{user.name.split(' ')[0]}
+            p(class="text-sm text-slate-500 font-medium mt-1 flex items-center gap-2") 
+              span(class="bg-slate-100 px-2 py-0.5 rounded text-xs font-bold") ID: #{user.id}
+              span • #{user.gender}
+        
+        a(href="/booking/new" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md shadow-green-200 flex items-center justify-center gap-2 hover:-translate-y-0.5") 
+          span ➕
+          span Book Appointment
+
+      //- Dashboard Grid
+      div(class="grid grid-cols-1 xl:grid-cols-3 gap-8")
+        
+        div(class="xl:col-span-2 space-y-8")
+          //- Vitals Card
+          section(class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 relative overflow-hidden")
+            div(class="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-bl-full -z-10")
+            h3(class="text-xs font-extrabold text-slate-400 mb-6 uppercase tracking-widest flex items-center gap-2") 
+              span(class="w-2 h-2 rounded-full bg-green-500")
+              | Latest Vitals
+            
+            div(class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6")
+              div(class="bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-green-200 transition-colors")
+                p(class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1") Blood Pressure 
+                p(class="text-xl md:text-2xl font-black text-slate-700") #{user.vitals.bp} 
+              
+              div(class="bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-red-200 transition-colors")
+                p(class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1") Heart Rate 
+                p(class="text-xl md:text-2xl font-black text-slate-700 flex items-baseline gap-1") #{user.vitals.hr} <span class="text-xs text-slate-400 font-medium">bpm</span>
+              
+              div(class="bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-blue-200 transition-colors")
+                p(class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1") Oxygen (SpO2) 
+                p(class="text-xl md:text-2xl font-black text-slate-700 flex items-baseline gap-1") #{user.vitals.spo2}<span class="text-xs text-slate-400 font-medium">%</span>
+              
+              div(class="bg-slate-50 rounded-2xl p-4 border border-slate-100 hover:border-orange-200 transition-colors")
+                p(class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1") Temperature 
+                p(class="text-xl md:text-2xl font-black text-slate-700 flex items-baseline gap-1") #{user.vitals.temp}<span class="text-xs text-slate-400 font-medium">°F</span>
+
+          //- Timeline Card
+          section(class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100")
+            div(class="flex justify-between items-center mb-8")
+              h3(class="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2") 
+                span(class="w-2 h-2 rounded-full bg-blue-500")
+                | Visit Timeline
+              a(href="/dashboard/patient/records" class="text-sm font-bold text-green-600 hover:text-green-700") View All →
+            
+            div(class="space-y-6 relative before:absolute before:inset-0 before:ml-6 before:-translate-x-px md:before:ml-[1.35rem] before:h-full before:w-0.5 before:bg-slate-100")
+              each item in user.timeline
+                div(class="relative flex items-start gap-4 md:gap-6 group")
+                  div(class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white bg-green-100 text-green-600 shadow-sm shrink-0 z-10 group-hover:bg-green-600 group-hover:text-white transition-colors duration-300")
+                    span(class="text-lg") ⚕️
+                  div(class="bg-white p-4 rounded-2xl flex-1 border border-slate-100 shadow-sm hover:shadow-md hover:border-green-200 transition-all")
+                    p(class="text-[10px] font-extrabold text-green-600 tracking-wider mb-1") #{item.date} 
+                    p(class="text-base font-bold text-slate-800") #{item.title}
+                    p(class="text-sm text-slate-500 font-medium mt-1 leading-relaxed") #{item.desc}
+
+  //- Script to handle mobile menu toggle
+  script.
+    const btn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function toggleMenu() {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+
+    btn.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);

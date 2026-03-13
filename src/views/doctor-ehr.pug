@@ -1,0 +1,146 @@
+extends layouts/main
+
+block content
+  div(class="flex flex-col md:flex-row min-h-screen bg-slate-50 font-sans")
+    
+    //- Mobile Header
+    div(class="md:hidden bg-green-800 text-white p-4 flex justify-between items-center shadow-md z-20 relative")
+      div(class="flex items-center gap-2")
+        span(class="text-2xl") 
+        h2(class="text-lg font-bold tracking-wide") HMS-Care
+      button#mobileMenuBtn(class="text-white focus:outline-none p-2 rounded-lg hover:bg-green-700 transition-colors")
+        svg(class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24")
+          path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16")
+
+    //- Doctor's Responsive Sidebar
+    aside#sidebar(class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-50 w-64 bg-green-900 text-white flex flex-col justify-between shadow-2xl md:shadow-lg")
+      div(class="p-6")
+        div(class="hidden md:flex items-center gap-3 mb-10 border-b border-green-800 pb-6")
+          span(class="text-3xl") 
+          h2(class="text-xl font-extrabold tracking-wider text-green-50") Care
+        
+        nav(class="space-y-2 mt-8 md:mt-0")
+          p(class="text-[10px] font-bold text-green-400 uppercase tracking-widest mb-4 px-3") Clinical Menu
+          
+          //- Back to Dashboard Button
+          a(href="/dashboard/doctor" class="flex items-center gap-3 text-green-200 hover:bg-green-800 hover:text-white p-3 rounded-lg font-medium transition-all group")
+            span(class="text-lg group-hover:-translate-x-1 transition-transform") ⬅️
+            span Back to Overview
+            
+          //- ACTIVE PAGE: Patient Directory / EHR
+          a(href="#" class="flex items-center gap-3 bg-green-800 border-l-4 border-green-400 text-white p-3 rounded-r-lg shadow-inner font-bold transition-all")
+            span(class="text-lg") 📋
+            span Patient EHR
+      
+      div(class="p-6 border-t border-green-800")
+        a(href="/auth/logout" class="flex items-center justify-center gap-2 w-full bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5")
+          span 
+          span Secure Logout
+
+    div#sidebarOverlay(class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity")
+
+    //- Main Clinical Content Area
+    main(class="flex-1 p-4 md:p-8 w-full max-w-7xl mx-auto overflow-y-auto")
+      
+      //- Patient Header & Clinical Actions
+      header(class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col xl:flex-row xl:items-center justify-between gap-6")
+        div(class="flex items-center gap-5")
+          div(class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 text-3xl font-bold border-4 border-white shadow-md") 👤
+          div
+            div(class="flex items-center gap-3 mb-1")
+              h2(class="text-2xl font-black text-slate-800") #{patient.name}
+              span(class="text-[10px] font-extrabold text-slate-500 bg-slate-100 px-2 py-1 rounded-md tracking-wider") ID: #{patient.id}
+            div(class="flex flex-wrap items-center gap-2 md:gap-4 text-sm text-slate-500 font-medium")
+              span(class="bg-slate-50 px-3 py-1 rounded-full border border-slate-100") #{patient.age} yrs, #{patient.gender}
+              span(class="bg-red-50 text-red-700 px-3 py-1 rounded-full border border-red-100 flex items-center gap-1 font-bold") 🩸 Type: #{patient.bloodGroup}
+              span(class="bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-100 flex items-center gap-1") 🕒 Last Visit: #{patient.lastVisit}
+        
+        //- Doctor Actions
+        div(class="flex flex-wrap items-center gap-3")
+          a(href="#" class="bg-white border border-slate-200 hover:border-slate-300 text-slate-600 px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm flex items-center gap-2") 
+            span 🔬
+            span Order Labs
+          a(href="/dashboard/doctor/prescribe" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-md shadow-green-200 flex items-center gap-2 hover:-translate-y-0.5") 
+            span 💊
+            span Prescribe Medication
+
+      div(class="grid grid-cols-1 xl:grid-cols-3 gap-8")
+        
+        //- Left Column: Vitals & Medical History
+        div(class="xl:col-span-2 space-y-8")
+          
+          //- Quick Vitals Card
+          div(class="grid grid-cols-2 md:grid-cols-4 gap-4")
+            div(class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center")
+              p(class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1") BP
+              p(class="text-xl font-black text-slate-700") #{patient.vitals.bp} 
+            div(class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center")
+              p(class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1") Heart Rate
+              p(class="text-xl font-black text-slate-700") #{patient.vitals.hr}
+            div(class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center")
+              p(class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1") SpO2
+              p(class="text-xl font-black text-slate-700") #{patient.vitals.spo2}%
+            div(class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center")
+              p(class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1") Temp
+              p(class="text-xl font-black text-slate-700") #{patient.vitals.temp}°F
+
+          //- Clinical Timeline
+          section(class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-slate-100")
+            h3(class="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-8") 
+              span(class="w-2 h-2 rounded-full bg-blue-500")
+              | Encounter History
+            
+            div(class="space-y-6 relative before:absolute before:inset-0 before:ml-6 before:-translate-x-px md:before:ml-[1.35rem] before:h-full before:w-0.5 before:bg-slate-100")
+              each item in patient.timeline
+                div(class="relative flex items-start gap-4 md:gap-6 group")
+                  div(class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white bg-slate-50 text-slate-400 shadow-sm shrink-0 z-10 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors duration-300")
+                    span(class="text-lg") ⚕️
+                  div(class="bg-slate-50 p-4 rounded-2xl flex-1 border border-slate-100 group-hover:bg-white group-hover:shadow-md group-hover:border-blue-100 transition-all")
+                    p(class="text-[10px] font-extrabold text-blue-600 tracking-wider mb-1") #{item.date} 
+                    p(class="text-base font-bold text-slate-800") #{item.title}
+                    p(class="text-sm text-slate-500 font-medium mt-1 leading-relaxed") #{item.desc}
+
+        //- Right Column: Alerts, Diagnoses, Medications
+        div(class="space-y-6")
+          
+          //- Critical Alerts / Allergies
+          section(class="bg-red-50 p-6 rounded-3xl shadow-sm border border-red-100")
+            h3(class="text-xs font-extrabold text-red-600 uppercase tracking-widest mb-4 flex items-center gap-2") 
+              span ⚠️
+              | Critical Alerts & Allergies
+            div(class="flex flex-wrap gap-2")
+              each allergy in patient.allergies
+                if allergy.type === 'danger'
+                  span(class="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-sm") #{allergy.name}
+                else
+                  span(class="bg-orange-100 text-orange-800 border border-orange-200 text-xs font-bold px-3 py-1.5 rounded-xl") #{allergy.name}
+
+          //- Active Diagnoses
+          section(class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100")
+            h3(class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-4") Active Problem List
+            div(class="space-y-3")
+              each diag in patient.activeDiagnoses
+                div(class="p-3 bg-slate-50 rounded-xl border border-slate-100")
+                  div(class="flex justify-between items-start mb-1")
+                    p(class="font-bold text-slate-800 text-sm") #{diag.name}
+                    span(class="text-[9px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider " + (diag.status === 'Active' ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-600')) #{diag.status}
+                  p(class="text-[11px] text-slate-500 font-medium") Onset: #{diag.date}
+
+          //- Current Medications
+          section(class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100")
+            h3(class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-4") Active Prescriptions
+            div(class="space-y-3")
+              each med in patient.medications
+                div(class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100")
+                  div(class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-sm shrink-0") 💊
+                  div
+                    p(class="font-bold text-slate-800 text-sm") #{med.name}
+                    p(class="text-[11px] text-slate-500 font-medium mt-0.5") #{med.instructions}
+
+  script.
+    const btn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    function toggleMenu() { sidebar.classList.toggle('-translate-x-full'); overlay.classList.toggle('hidden'); }
+    btn.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
