@@ -230,4 +230,3 @@ await conn.query('DELETE FROM urgent_alerts');
 }
 
 seed().catch(err => { console.error('❌ Seed failed:', err.message); process.exit(1); });
-
