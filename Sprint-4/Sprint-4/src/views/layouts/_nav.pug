@@ -1,0 +1,155 @@
+mixin navLink(href, icon, label, active, current)
+  a(href=href
+    class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all " + (current === active ? 'bg-white/15 text-white font-semibold' : 'text-green-200 hover:bg-white/10 hover:text-white'))
+    span(class="text-base leading-none w-5 text-center") #{icon}
+    span #{label}
+    if current === active
+      span(class="ml-auto w-1.5 h-1.5 rounded-full bg-green-300 shrink-0")
+
+//- doctor nav links 
+mixin doctorNav(active)
+  +navLink('/dashboard/doctor',           '📊', 'Overview',         'overview',   active)
+  +navLink('/dashboard/doctor/schedule',  '📅', 'My Schedule',      'schedule',   active)
+  +navLink('/dashboard/doctor/directory', '👥', 'Patient Directory','directory',  active)
+  div(class="my-2 border-t border-green-800/60")
+  +navLink('/profile/edit',               '✏️', 'Edit Profile',     'profile',    active)
+
+//-  patient nav links ─
+mixin patientNav(active)
+  +navLink('/dashboard/patient',          '🏠', 'Dashboard',        'dashboard',  active)
+  +navLink('/dashboard/patient/records',  '📋', 'My Records',       'records',    active)
+  +navLink('/booking/new',                '➕', 'Book Appointment', 'booking',    active)
+  div(class="my-2 border-t border-green-800/60")
+  +navLink('/profile/edit',               '✏️', 'Edit Profile',     'profile',    active)
+
+//-  user badge 
+mixin userBadge(role)
+  if currentUser
+    div(class="px-3 py-2 bg-white/10 rounded-xl border border-white/10 mb-3")
+      p(class="text-[10px] font-semibold text-green-400 uppercase tracking-widest mb-0.5") Logged in as
+      p(class="text-sm font-semibold text-white truncate") #{currentUser.email}
+      span(class="inline-block mt-1 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase " + (role === 'doctor' ? 'bg-green-600 text-white' : 'bg-blue-600 text-white')) #{role}
+
+//-  logout button ─
+mixin logoutBtn()
+  a(href="/auth/logout" class="flex items-center justify-center gap-2 w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white p-2.5 rounded-xl font-semibold text-sm transition-all")
+    span(class="text-sm") 🔒
+    span Logout
+
+//-  DESKTOP sidebar (hidden on mobile) 
+mixin desktopSidebar(role, active)
+  aside(class="hidden md:flex flex-col w-60 shrink-0 bg-green-900 min-h-screen sticky top-0 h-screen overflow-y-auto")
+    //- Logo
+    a(href=(role==='doctor' ? '/dashboard/doctor' : '/dashboard/patient')
+      class="flex items-center gap-2.5 px-5 py-5 border-b border-green-800/70")
+      span(class="text-2xl leading-none") 🏥
+      span(class="text-base font-black tracking-wide text-white") HMS-Care
+
+    //- Nav content
+    div(class="flex-1 flex flex-col px-3 py-4 gap-1")
+      +userBadge(role)
+
+      p(class="text-[10px] font-bold text-green-500 uppercase tracking-widest px-2 mb-1 mt-1") Menu
+      if role === 'doctor'
+        +doctorNav(active)
+      else
+        +patientNav(active)
+
+    //- Logout at bottom
+    div(class="px-3 pb-4 shrink-0")
+      +logoutBtn()
+
+//-  MOBILE top bar ─
+mixin mobileTopBar(role, active)
+  //- Sticky top bar
+  div(class="md:hidden sticky top-0 z-40 bg-green-900 text-white shadow-lg")
+    div(class="flex items-center justify-between px-4 py-3")
+      a(href=(role==='doctor' ? '/dashboard/doctor' : '/dashboard/patient')
+        class="flex items-center gap-2")
+        span(class="text-xl leading-none") 🏥
+        span(class="text-base font-black tracking-wide") HMS-Care
+      button#mobileMenuBtn(
+        type="button"
+        aria-label="Open navigation"
+        aria-expanded="false"
+        class="p-2 rounded-xl hover:bg-green-800 active:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400")
+        svg#hamburgerIcon(class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24")
+          path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16")
+        svg#closeIcon(class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24")
+          path(stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12")
+
+  //- Drawer (slides down below top bar, full width)
+  div#mobileDrawer(class="md:hidden fixed inset-x-0 z-30 bg-green-900 shadow-2xl -translate-y-full" style="top:52px; transition: transform 0.26s cubic-bezier(.4,0,.2,1);")
+    div(class="px-4 py-4 border-t border-green-800/70 max-h-[calc(100vh-52px)] overflow-y-auto")
+      +userBadge(role)
+
+      p(class="text-[10px] font-bold text-green-500 uppercase tracking-widest px-2 mb-1") Menu
+      nav(class="space-y-0.5")
+        if role === 'doctor'
+          +doctorNav(active)
+        else
+          +patientNav(active)
+
+      div(class="mt-4 pt-4 border-t border-green-800/70")
+        +logoutBtn()
+
+  //- Semi-transparent backdrop
+  div#mobileBackdrop(class="md:hidden fixed inset-0 z-20 bg-slate-900/50 backdrop-blur-sm hidden" style="top:52px")
+
+mixin pageShell(role, active)
+  div(class="flex min-h-screen bg-slate-50")
+    +desktopSidebar(role, active)
+
+    div(class="flex-1 flex flex-col min-w-0")
+      +mobileTopBar(role, active)
+
+      main(class="flex-1 p-4 md:p-8 overflow-y-auto")
+        block
+
+  +navScript()
+
+//-  Script (one copy, used by pageShell) 
+mixin navScript()
+  script.
+    (function () {
+      var btn      = document.getElementById('mobileMenuBtn');
+      var drawer   = document.getElementById('mobileDrawer');
+      var backdrop = document.getElementById('mobileBackdrop');
+      var hamIcon  = document.getElementById('hamburgerIcon');
+      var closeIco = document.getElementById('closeIcon');
+      if (!btn) return;
+
+      var open = false;
+
+      function openMenu() {
+        open = true;
+        drawer.style.transform   = 'translateY(0)';
+        backdrop.classList.remove('hidden');
+        hamIcon.classList.add('hidden');
+        closeIco.classList.remove('hidden');
+        document.body.classList.add('nav-open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+
+      function closeMenu() {
+        open = false;
+        drawer.style.transform = 'translateY(-100%)';
+        backdrop.classList.add('hidden');
+        hamIcon.classList.remove('hidden');
+        closeIco.classList.add('hidden');
+        document.body.classList.remove('nav-open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+
+      btn.addEventListener('click', function () { open ? closeMenu() : openMenu(); });
+      backdrop.addEventListener('click', closeMenu);
+
+      //- Close when a nav link is tapped
+      drawer.querySelectorAll('a').forEach(function (a) {
+        a.addEventListener('click', closeMenu);
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeMenu();
+      });
+    })();
